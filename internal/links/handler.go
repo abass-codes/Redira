@@ -37,7 +37,11 @@ func (h *Handler) Create(c *gin.Context) {
 		return
 	}
 
-	link, err := h.service.Create(c.Request.Context(), req.URL)
+	link, err := h.service.Create(
+		c.Request.Context(),
+		req.URL,
+	)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -56,7 +60,14 @@ func (h *Handler) Create(c *gin.Context) {
 func (h *Handler) Redirect(c *gin.Context) {
 	shortCode := c.Param("shortCode")
 
-	link, err := h.service.Redirect(c.Request.Context(), shortCode)
+	link, err := h.service.Redirect(
+		c.Request.Context(),
+		shortCode,
+		c.ClientIP(),
+		c.Request.UserAgent(),
+		c.Request.Referer(),
+	)
+
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{
 			"error": "link not found",
@@ -64,5 +75,8 @@ func (h *Handler) Redirect(c *gin.Context) {
 		return
 	}
 
-	c.Redirect(http.StatusFound, link.OriginalUrl)
+	c.Redirect(
+		http.StatusFound,
+		link.OriginalUrl,
+	)
 }
