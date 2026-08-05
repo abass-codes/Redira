@@ -52,3 +52,17 @@ func (h *Handler) Create(c *gin.Context) {
 		ShortURL:    "http://localhost:8080/r/" + link.ShortCode,
 	})
 }
+
+func (h *Handler) Redirect(c *gin.Context) {
+	shortCode := c.Param("shortCode")
+
+	link, err := h.service.Redirect(c.Request.Context(), shortCode)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "link not found",
+		})
+		return
+	}
+
+	c.Redirect(http.StatusFound, link.OriginalUrl)
+}

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	db "github.com/abass-codes/redira/internal/database/db"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Repository struct {
@@ -26,4 +27,17 @@ func (r *Repository) Create(ctx context.Context, originalURL, shortCode string) 
 	}
 
 	return &link, nil
+}
+
+func (r *Repository) GetByShortCode(ctx context.Context, shortCode string) (*db.Link, error) {
+	link, err := r.queries.GetLinkByShortCode(ctx, shortCode)
+	if err != nil {
+		return nil, err
+	}
+
+	return &link, nil
+}
+
+func (r *Repository) IncrementClicks(ctx context.Context, id pgtype.UUID) error {
+	return r.queries.IncrementClickCount(ctx, id)
 }

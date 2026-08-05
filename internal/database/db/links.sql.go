@@ -7,6 +7,8 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createLink = `-- name: CreateLink :one
@@ -43,7 +45,15 @@ func (q *Queries) CreateLink(ctx context.Context, arg CreateLinkParams) (Link, e
 }
 
 const getLinkByShortCode = `-- name: GetLinkByShortCode :one
-SELECT id, original_url, short_code, title, click_count, expires_at, created_at, updated_at
+SELECT
+    id,
+    original_url,
+    short_code,
+    title,
+    click_count,
+    expires_at,
+    created_at,
+    updated_at
 FROM links
 WHERE short_code = $1
 LIMIT 1
@@ -63,4 +73,17 @@ func (q *Queries) GetLinkByShortCode(ctx context.Context, shortCode string) (Lin
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const incrementClickCount = `-- name: IncrementClickCount :exec
+UPDATE links
+SET
+    click_count = click_count + 1,
+    updated_at = NOW()
+WHERE id = $1
+`
+
+func (q *Queries) IncrementClickCount(ctx context.Context, id pgtype.UUID) error {
+	_, err := q.db.Exec(ctx, incrementClickCount, id)
+	return err
 }

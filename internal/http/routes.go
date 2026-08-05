@@ -9,6 +9,8 @@ import (
 func RegisterRoutes(router *gin.Engine, linkHandler *links.Handler) {
 	router.GET("/health", health.Handler)
 
+	router.GET("/r/:shortCode", linkHandler.Redirect)
+
 	v1 := router.Group("/api/v1")
 	{
 		v1.POST("/links", linkHandler.Create)
