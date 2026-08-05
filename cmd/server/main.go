@@ -5,7 +5,8 @@ import (
 
 	"github.com/abass-codes/redira/internal/config"
 	"github.com/abass-codes/redira/internal/database"
-	"github.com/abass-codes/redira/internal/health"
+	apphttp "github.com/abass-codes/redira/internal/http"
+	"github.com/abass-codes/redira/internal/links"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,9 +21,13 @@ func main() {
 
 	log.Println("✅ Connected to PostgreSQL")
 
+	repository := links.NewRepository(db.Queries)
+	service := links.NewService(repository)
+	handler := links.NewHandler(service)
+
 	router := gin.New()
 
-	router.GET("/health", health.Handler)
+	apphttp.RegisterRoutes(router, handler)
 
 	log.Printf("🚀 %s starting on http://localhost:%s", cfg.AppName, cfg.ServerPort)
 

@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	db "github.com/abass-codes/redira/internal/database/db"
 	"github.com/jackc/pgx/v5"
 )
 
 type Database struct {
-	Conn *pgx.Conn
+	Conn    *pgx.Conn
+	Queries *db.Queries
 }
 
 func Connect(databaseURL string) (*Database, error) {
@@ -18,7 +20,8 @@ func Connect(databaseURL string) (*Database, error) {
 	}
 
 	return &Database{
-		Conn: conn,
+		Conn:    conn,
+		Queries: db.New(conn),
 	}, nil
 }
 
