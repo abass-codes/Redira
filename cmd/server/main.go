@@ -30,7 +30,6 @@ func main() {
 
 	log.Println("✅ Connected to Redis")
 
-	// Links
 	linkRepository := links.NewRepository(db.Queries)
 
 	linkService := links.NewService(
@@ -40,7 +39,6 @@ func main() {
 
 	linkHandler := links.NewHandler(linkService)
 
-	// Analytics
 	analyticsRepository := analytics.NewRepository(db.Queries)
 
 	analyticsService := analytics.NewService(

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -8,7 +9,7 @@ import (
 
 type Config struct {
 	AppName     string
-	Environment string
+	AppEnv      string
 	ServerPort  string
 	DatabaseURL string
 	RedisURL    string
@@ -17,13 +18,17 @@ type Config struct {
 func Load() *Config {
 	_ = godotenv.Load()
 
-	return &Config{
+	cfg := &Config{
 		AppName:     getEnv("APP_NAME", "Redira"),
-		Environment: getEnv("APP_ENV", "development"),
+		AppEnv:      getEnv("APP_ENV", "development"),
 		ServerPort:  getEnv("SERVER_PORT", "8080"),
 		DatabaseURL: getEnv("DATABASE_URL", ""),
 		RedisURL:    getEnv("REDIS_URL", ""),
 	}
+
+	log.Printf("Loaded config (%s)", cfg.AppEnv)
+
+	return cfg
 }
 
 func getEnv(key, fallback string) string {
