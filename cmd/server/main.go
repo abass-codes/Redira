@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/abass-codes/redira/internal/cache"
 	"github.com/abass-codes/redira/internal/config"
 	"github.com/abass-codes/redira/internal/database"
 	apphttp "github.com/abass-codes/redira/internal/http"
@@ -21,8 +22,20 @@ func main() {
 
 	log.Println("✅ Connected to PostgreSQL")
 
+	redisCache, err := cache.New(cfg.RedisURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("✅ Connected to Redis")
+
 	repository := links.NewRepository(db.Queries)
-	service := links.NewService(repository)
+
+	service := links.NewService(
+		repository,
+		redisCache,
+	)
+
 	handler := links.NewHandler(service)
 
 	router := gin.New()
