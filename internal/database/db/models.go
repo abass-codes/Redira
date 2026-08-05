@@ -8,6 +8,15 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type ClickEvent struct {
+	ID        pgtype.UUID
+	LinkID    pgtype.UUID
+	ClickedAt pgtype.Timestamptz
+	IpAddress pgtype.Text
+	UserAgent pgtype.Text
+	Referer   pgtype.Text
+}
+
 type Link struct {
 	ID          pgtype.UUID
 	OriginalUrl string

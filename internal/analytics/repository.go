@@ -24,11 +24,12 @@ func (r *Repository) CreateEvent(
 	userAgent string,
 	referer string,
 ) error {
+
 	return r.queries.CreateClickEvent(ctx, db.CreateClickEventParams{
 		LinkID:    linkID,
-		IpAddress: stringPtr(ip),
-		UserAgent: stringPtr(userAgent),
-		Referer:   stringPtr(referer),
+		IpAddress: pgtype.Text{String: ip, Valid: ip != ""},
+		UserAgent: pgtype.Text{String: userAgent, Valid: userAgent != ""},
+		Referer:   pgtype.Text{String: referer, Valid: referer != ""},
 	})
 }
 
@@ -36,12 +37,6 @@ func (r *Repository) GetAnalytics(
 	ctx context.Context,
 	linkID pgtype.UUID,
 ) ([]db.GetLinkAnalyticsRow, error) {
-	return r.queries.GetLinkAnalytics(ctx, linkID)
-}
 
-func stringPtr(s string) *string {
-	if s == "" {
-		return nil
-	}
-	return &s
+	return r.queries.GetLinkAnalytics(ctx, linkID)
 }
