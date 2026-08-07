@@ -22,7 +22,7 @@ VALUES (
     $2,
     $3
 )
-RETURNING id, original_url, short_code, title, click_count, expires_at, created_at, updated_at, user_id
+RETURNING id, original_url, short_code, title, click_count, expires_at, created_at, updated_at, user_id, active
 `
 
 type CreateUserLinkParams struct {
@@ -44,6 +44,7 @@ func (q *Queries) CreateUserLink(ctx context.Context, arg CreateUserLinkParams) 
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.UserID,
+		&i.Active,
 	)
 	return i, err
 }
@@ -65,7 +66,7 @@ func (q *Queries) DeleteUserLink(ctx context.Context, arg DeleteUserLinkParams) 
 }
 
 const getUserLinks = `-- name: GetUserLinks :many
-SELECT id, original_url, short_code, title, click_count, expires_at, created_at, updated_at, user_id
+SELECT id, original_url, short_code, title, click_count, expires_at, created_at, updated_at, user_id, active
 FROM links
 WHERE user_id = $1
 ORDER BY created_at DESC
@@ -90,6 +91,7 @@ func (q *Queries) GetUserLinks(ctx context.Context, userID pgtype.UUID) ([]Link,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 			&i.UserID,
+			&i.Active,
 		); err != nil {
 			return nil, err
 		}

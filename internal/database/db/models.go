@@ -27,6 +27,7 @@ type Link struct {
 	CreatedAt   pgtype.Timestamptz
 	UpdatedAt   pgtype.Timestamptz
 	UserID      pgtype.UUID
+	Active      bool
 }
 
 type User struct {

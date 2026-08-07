@@ -20,7 +20,7 @@ VALUES (
     $1,
     $2
 )
-RETURNING id, original_url, short_code, title, click_count, expires_at, created_at, updated_at, user_id
+RETURNING id, original_url, short_code, title, click_count, expires_at, created_at, updated_at, user_id, active
 `
 
 type CreateLinkParams struct {
@@ -41,6 +41,7 @@ func (q *Queries) CreateLink(ctx context.Context, arg CreateLinkParams) (Link, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.UserID,
+		&i.Active,
 	)
 	return i, err
 }

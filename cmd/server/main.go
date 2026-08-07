@@ -36,6 +36,8 @@ func main() {
 
 	log.Println("✅ Connected to Redis")
 
+	// Link dependencies
+
 	linkRepository := links.NewRepository(
 		db.Queries,
 	)
@@ -44,6 +46,8 @@ func main() {
 		db.Queries,
 	)
 
+	// Analytics dependencies
+
 	analyticsRepository := analytics.NewRepository(
 		db.Queries,
 	)
@@ -51,6 +55,8 @@ func main() {
 	analyticsService := analytics.NewService(
 		analyticsRepository,
 	)
+
+	// Link service
 
 	linkService := links.NewService(
 		linkRepository,
@@ -67,6 +73,18 @@ func main() {
 		userLinkRepository,
 	)
 
+	// Feature 6: Link Management
+
+	managementService := links.NewManagementService(
+		db.Queries,
+	)
+
+	managementHandler := links.NewManagementHandler(
+		managementService,
+	)
+
+	// Authentication
+
 	authRepository := auth.NewRepository(
 		db.Queries,
 	)
@@ -79,6 +97,8 @@ func main() {
 		authService,
 	)
 
+	// Analytics handler
+
 	analyticsHandler := analytics.NewHandler(
 		analyticsService,
 	)
@@ -89,6 +109,7 @@ func main() {
 		router,
 		linkHandler,
 		userLinkHandler,
+		managementHandler,
 		analyticsHandler,
 		authHandler,
 		redisCache.Client,
