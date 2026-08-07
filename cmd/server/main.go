@@ -8,7 +8,9 @@ import (
 	"github.com/abass-codes/redira/internal/cache"
 	"github.com/abass-codes/redira/internal/config"
 	"github.com/abass-codes/redira/internal/database"
+
 	apphttp "github.com/abass-codes/redira/internal/http"
+
 	"github.com/abass-codes/redira/internal/links"
 	"github.com/abass-codes/redira/internal/redirect"
 
@@ -53,6 +55,20 @@ func main() {
 
 	analyticsService := analytics.NewService(
 		analyticsRepository,
+	)
+
+	// Feature 8 - Analytics Dashboard
+
+	dashboardRepository := analytics.NewDashboardRepository(
+		db.Queries,
+	)
+
+	dashboardService := analytics.NewDashboardService(
+		dashboardRepository,
+	)
+
+	dashboardHandler := analytics.NewDashboardHandler(
+		dashboardService,
 	)
 
 	linkService := links.NewService(
@@ -118,6 +134,7 @@ func main() {
 		userLinkHandler,
 		managementHandler,
 		analyticsHandler,
+		dashboardHandler,
 		authHandler,
 		redisCache.Client,
 	)
@@ -128,7 +145,9 @@ func main() {
 		cfg.ServerPort,
 	)
 
-	if err := router.Run(":" + cfg.ServerPort); err != nil {
+	if err := router.Run(
+		":" + cfg.ServerPort,
+	); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -26,6 +26,8 @@ func RegisterRoutes(
 
 	analyticsHandler *analytics.Handler,
 
+	dashboardHandler *analytics.DashboardHandler,
+
 	authHandler *auth.Handler,
 
 	redisClient *redis.Client,
@@ -97,7 +99,7 @@ func RegisterRoutes(
 		userLinkHandler.DeleteMyLink,
 	)
 
-	// Feature 6
+	// Feature 6 - Link Management
 
 	protected.GET(
 		"/links/:id",
@@ -119,10 +121,28 @@ func RegisterRoutes(
 		managementHandler.Enable,
 	)
 
-	// Analytics
+	// Feature 2 - Existing Analytics
 
 	v1.GET(
 		"/analytics/:id",
 		analyticsHandler.Get,
 	)
+
+	// Feature 8 - Analytics Dashboard
+
+	protected.GET(
+		"/dashboard",
+		dashboardHandler.Summary,
+	)
+
+	protected.GET(
+		"/analytics/links/:id",
+		dashboardHandler.GetLinkAnalytics,
+	)
+
+	protected.GET(
+		"/analytics/links/:id/timeline",
+		dashboardHandler.Timeline,
+	)
+
 }

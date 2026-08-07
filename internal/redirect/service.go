@@ -2,7 +2,6 @@ package redirect
 
 import (
 	"context"
-	"log"
 	"time"
 
 	db "github.com/abass-codes/redira/internal/database/db"
@@ -33,8 +32,6 @@ func (s *Service) Redirect(
 
 	cacheKey := "redirect:" + shortCode
 
-	// Redis lookup
-
 	cached, err := s.redis.Get(
 		ctx,
 		cacheKey,
@@ -42,14 +39,8 @@ func (s *Service) Redirect(
 
 	if err == nil && cached != "" {
 
-		log.Println("REDIS HIT:", shortCode)
-
 		return cached, nil
 	}
-
-	log.Println("REDIS MISS:", shortCode)
-
-	// Database lookup
 
 	link, err := s.queries.GetRedirectLink(
 		ctx,
@@ -58,49 +49,42 @@ func (s *Service) Redirect(
 
 	if err != nil {
 
-		log.Println("DATABASE ERROR:", err)
-
 		return "", ErrNotFound
 	}
-
-	log.Println(
-		"DATABASE FOUND:",
-		link.ShortCode,
-		link.OriginalUrl,
-	)
-
-	// Check active status
 
 	if !link.Active {
 
 		return "", ErrDisabled
 	}
 
-	// Check expiration
-
 	if link.ExpiresAt.Valid {
 
-		if link.ExpiresAt.Time.Before(
-			time.Now(),
-		) {
+		if link.ExpiresAt.Time.Before(time.Now()) {
 
 			return "", ErrExpired
 		}
 	}
 
-	// Store in Redis
+	// Analytics event tracking
 
-	err = s.redis.Set(
+	err = s.queries.CreateClickEvent(
+		ctx,
+		db.CreateClickEventParams{
+			LinkID: link.ID,
+		},
+	)
+
+	if err != nil {
+
+		return link.OriginalUrl, nil
+	}
+
+	_ = s.redis.Set(
 		ctx,
 		cacheKey,
 		link.OriginalUrl,
 		time.Hour,
 	).Err()
-
-	if err != nil {
-
-		log.Println("REDIS SET ERROR:", err)
-	}
 
 	return link.OriginalUrl, nil
 }
