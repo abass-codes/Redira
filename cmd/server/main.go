@@ -10,6 +10,7 @@ import (
 	"github.com/abass-codes/redira/internal/database"
 	"github.com/abass-codes/redira/internal/logger"
 	"github.com/abass-codes/redira/internal/middleware"
+	"github.com/abass-codes/redira/internal/observability"
 
 	apphttp "github.com/abass-codes/redira/internal/http"
 
@@ -160,6 +161,12 @@ func main() {
 		middleware.SecurityHeaders(),
 	)
 
+	// Feature 13 - Observability Metrics
+
+	router.Use(
+		observability.MetricsMiddleware(),
+	)
+
 	// Feature 9 - Frontend CORS
 
 	router.Use(
@@ -187,6 +194,10 @@ func main() {
 			AllowCredentials: true,
 		}),
 	)
+
+	// Feature 13 - Metrics Endpoint
+
+	observability.RegisterMetrics(router)
 
 	apphttp.RegisterRoutes(
 		router,

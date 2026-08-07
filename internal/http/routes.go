@@ -149,5 +149,4 @@ func RegisterRoutes(
 		"/analytics/links/:id/timeline",
 		dashboardHandler.Timeline,
 	)
-
 }
