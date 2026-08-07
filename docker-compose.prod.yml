@@ -1,0 +1,78 @@
+services:
+
+  api:
+    build:
+      context: .
+      dockerfile: deployments/docker/Dockerfile
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      APP_NAME: Redira
+      APP_ENV: production
+      SERVER_PORT: 8080
+
+      DATABASE_URL: postgres://redira:password@postgres:5432/redira
+
+      REDIS_URL: redis://redis:6379
+
+      JWT_SECRET: production_secret
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+      redis:
+        condition: service_healthy
+
+
+  postgres:
+    image: postgres:17
+
+    environment:
+      POSTGRES_USER: redira
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: redira
+
+    volumes:
+      - redira_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U redira -d redira"
+        ]
+
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+
+  redis:
+    image: redis:7
+
+    volumes:
+      - redira_redis_data:/data
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "ping"
+        ]
+
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+
+volumes:
+
+  redira_postgres_data:
+
+  redira_redis_data:

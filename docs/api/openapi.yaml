@@ -1,0 +1,29 @@
+openapi: 3.0.0
+
+info:
+  title: Redira API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+
+  /health:
+    get:
+      summary: Health check
+
+  /api/v1/auth/login:
+    post:
+      summary: User login
+
+  /api/v1/links:
+    post:
+      summary: Create short link
+
+    get:
+      summary: Get user links
+
+  /api/v1/dashboard:
+    get:
+      summary: Analytics dashboard

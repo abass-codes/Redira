@@ -5,6 +5,7 @@ import (
 
 	"github.com/abass-codes/redira/internal/analytics"
 	"github.com/abass-codes/redira/internal/auth"
+	"github.com/abass-codes/redira/internal/health"
 	"github.com/abass-codes/redira/internal/links"
 	"github.com/abass-codes/redira/internal/middleware"
 	"github.com/abass-codes/redira/internal/redirect"
@@ -33,6 +34,8 @@ func RegisterRoutes(
 	redisClient *redis.Client,
 ) {
 
+	// Feature 10 - Health Checks
+
 	router.GET(
 		"/health",
 		func(c *gin.Context) {
@@ -45,7 +48,9 @@ func RegisterRoutes(
 		},
 	)
 
-	// Feature 7 production redirect
+	health.Register(router)
+
+	// Feature 7 - Production Redirect Engine
 
 	router.GET(
 		"/r/:shortCode",
@@ -80,14 +85,14 @@ func RegisterRoutes(
 		middleware.AuthRequired(),
 	)
 
-	// Create links
+	// Feature 9 - Create links
 
 	protected.POST(
 		"/links",
 		linkHandler.Create,
 	)
 
-	// User links
+	// Feature 5 - User Owned Links
 
 	protected.GET(
 		"/links",
@@ -121,7 +126,7 @@ func RegisterRoutes(
 		managementHandler.Enable,
 	)
 
-	// Feature 2 - Existing Analytics
+	// Feature 2 - Analytics
 
 	v1.GET(
 		"/analytics/:id",

@@ -8,6 +8,7 @@ import (
 	"github.com/abass-codes/redira/internal/cache"
 	"github.com/abass-codes/redira/internal/config"
 	"github.com/abass-codes/redira/internal/database"
+	"github.com/abass-codes/redira/internal/logger"
 
 	apphttp "github.com/abass-codes/redira/internal/http"
 
@@ -16,29 +17,47 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+
+	err := godotenv.Load()
+
+	if err != nil {
+		log.Println("No .env file found")
+	}
+
+	appLogger := logger.New()
+	defer appLogger.Sync()
 
 	cfg := config.Load()
 
 	db, err := database.Connect(cfg.DatabaseURL)
 
 	if err != nil {
-		log.Fatal(err)
+		appLogger.Fatal(
+			"failed to connect PostgreSQL",
+		)
 	}
 
 	defer db.Close()
 
-	log.Println("✅ Connected to PostgreSQL")
+	appLogger.Info(
+		"connected to PostgreSQL",
+	)
 
 	redisCache, err := cache.New(cfg.RedisURL)
 
 	if err != nil {
-		log.Fatal(err)
+		appLogger.Fatal(
+			"failed to connect Redis",
+		)
 	}
 
-	log.Println("✅ Connected to Redis")
+	appLogger.Info(
+		"connected to Redis",
+	)
 
 	// Existing link system
 
@@ -128,13 +147,17 @@ func main() {
 
 	router := gin.New()
 
+	router.SetTrustedProxies(nil)
+
 	// Feature 9 - Frontend CORS
 
 	router.Use(
 		cors.New(cors.Config{
+
 			AllowOrigins: []string{
 				"http://localhost:3000",
 			},
+
 			AllowMethods: []string{
 				"GET",
 				"POST",
@@ -142,11 +165,13 @@ func main() {
 				"DELETE",
 				"OPTIONS",
 			},
+
 			AllowHeaders: []string{
 				"Origin",
 				"Content-Type",
 				"Authorization",
 			},
+
 			AllowCredentials: true,
 		}),
 	)
@@ -163,15 +188,16 @@ func main() {
 		redisCache.Client,
 	)
 
-	log.Printf(
-		"🚀 %s starting on http://localhost:%s",
-		cfg.AppName,
-		cfg.ServerPort,
+	appLogger.Info(
+		"Redira server starting",
 	)
 
 	if err := router.Run(
 		":" + cfg.ServerPort,
 	); err != nil {
+
 		log.Fatal(err)
+
 	}
+
 }
