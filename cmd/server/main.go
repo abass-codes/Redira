@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/abass-codes/redira/internal/analytics"
+	"github.com/abass-codes/redira/internal/auth"
 	"github.com/abass-codes/redira/internal/cache"
 	"github.com/abass-codes/redira/internal/config"
 	"github.com/abass-codes/redira/internal/database"
@@ -32,9 +33,13 @@ func main() {
 
 	log.Println("✅ Connected to Redis")
 
+	// Links
+
 	linkRepository := links.NewRepository(
 		db.Queries,
 	)
+
+	// Analytics
 
 	analyticsRepository := analytics.NewRepository(
 		db.Queries,
@@ -43,6 +48,22 @@ func main() {
 	analyticsService := analytics.NewService(
 		analyticsRepository,
 	)
+
+	// Authentication
+
+	authRepository := auth.NewRepository(
+		db.Queries,
+	)
+
+	authService := auth.NewService(
+		authRepository,
+	)
+
+	authHandler := auth.NewHandler(
+		authService,
+	)
+
+	// Link service
 
 	linkService := links.NewService(
 		linkRepository,
@@ -64,6 +85,7 @@ func main() {
 		router,
 		linkHandler,
 		analyticsHandler,
+		authHandler,
 		redisCache.Client,
 	)
 

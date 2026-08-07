@@ -27,3 +27,10 @@ type Link struct {
 	CreatedAt   pgtype.Timestamptz
 	UpdatedAt   pgtype.Timestamptz
 }
+
+type User struct {
+	ID           pgtype.UUID
+	Email        string
+	PasswordHash string
+	CreatedAt    pgtype.Timestamptz
+}
