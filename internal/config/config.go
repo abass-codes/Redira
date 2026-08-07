@@ -3,26 +3,56 @@ package config
 import (
 	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	AppName     string
-	ServerPort  string
-	DatabaseURL string
-	RedisURL    string
-	JWTSecret   string
+	AppName string
+
 	Environment string
+
+	ServerPort string
+
+	DatabaseURL string
+
+	RedisURL string
+
+	JWTSecret string
 }
 
 func Load() Config {
 
+	godotenv.Load()
+
 	cfg := Config{
-		AppName:     getEnv("APP_NAME", "Redira"),
-		ServerPort:  getEnv("SERVER_PORT", "8080"),
-		DatabaseURL: getEnvRequired("DATABASE_URL"),
-		RedisURL:    getEnvRequired("REDIS_URL"),
-		JWTSecret:   getEnvRequired("JWT_SECRET"),
-		Environment: getEnv("ENVIRONMENT", "development"),
+
+		AppName: getEnv(
+			"APP_NAME",
+			"Redira",
+		),
+
+		Environment: getEnv(
+			"APP_ENV",
+			"development",
+		),
+
+		ServerPort: getEnv(
+			"SERVER_PORT",
+			"8080",
+		),
+
+		DatabaseURL: required(
+			"DATABASE_URL",
+		),
+
+		RedisURL: required(
+			"REDIS_URL",
+		),
+
+		JWTSecret: required(
+			"JWT_SECRET",
+		),
 	}
 
 	log.Printf(
@@ -31,29 +61,41 @@ func Load() Config {
 	)
 
 	return cfg
+
 }
 
-func getEnv(key string, fallback string) string {
+func getEnv(
+	key string,
+	fallback string,
+) string {
 
 	value := os.Getenv(key)
 
 	if value == "" {
+
 		return fallback
+
 	}
 
 	return value
+
 }
 
-func getEnvRequired(key string) string {
+func required(
+	key string,
+) string {
 
 	value := os.Getenv(key)
 
 	if value == "" {
+
 		log.Fatalf(
 			"missing required environment variable: %s",
 			key,
 		)
+
 	}
 
 	return value
+
 }

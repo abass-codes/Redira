@@ -33,6 +33,10 @@ func main() {
 
 	cfg := config.Load()
 
+	if cfg.Environment == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	db, err := database.Connect(cfg.DatabaseURL)
 
 	if err != nil {
@@ -199,5 +203,4 @@ func main() {
 		log.Fatal(err)
 
 	}
-
 }

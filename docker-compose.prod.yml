@@ -17,9 +17,10 @@ services:
 
       REDIS_URL: redis://redis:6379
 
-      JWT_SECRET: production_secret
+      JWT_SECRET: production_secret_change_me
 
     depends_on:
+
       postgres:
         condition: service_healthy
 
@@ -28,17 +29,22 @@ services:
 
 
   postgres:
+
     image: postgres:17
 
     environment:
+
       POSTGRES_USER: redira
       POSTGRES_PASSWORD: password
       POSTGRES_DB: redira
 
     volumes:
+
       - redira_postgres_data:/var/lib/postgresql/data
 
+
     healthcheck:
+
       test:
         [
           "CMD-SHELL",
@@ -47,17 +53,21 @@ services:
 
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 5
 
 
 
   redis:
+
     image: redis:7
 
     volumes:
+
       - redira_redis_data:/data
 
+
     healthcheck:
+
       test:
         [
           "CMD",
@@ -67,7 +77,7 @@ services:
 
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 5
 
 
 
