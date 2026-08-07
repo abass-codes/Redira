@@ -10,6 +10,7 @@ import (
 	"github.com/abass-codes/redira/internal/database"
 	apphttp "github.com/abass-codes/redira/internal/http"
 	"github.com/abass-codes/redira/internal/links"
+	"github.com/abass-codes/redira/internal/redirect"
 
 	"github.com/gin-gonic/gin"
 )
@@ -36,7 +37,7 @@ func main() {
 
 	log.Println("✅ Connected to Redis")
 
-	// Link dependencies
+	// Existing link system
 
 	linkRepository := links.NewRepository(
 		db.Queries,
@@ -46,8 +47,6 @@ func main() {
 		db.Queries,
 	)
 
-	// Analytics dependencies
-
 	analyticsRepository := analytics.NewRepository(
 		db.Queries,
 	)
@@ -55,8 +54,6 @@ func main() {
 	analyticsService := analytics.NewService(
 		analyticsRepository,
 	)
-
-	// Link service
 
 	linkService := links.NewService(
 		linkRepository,
@@ -73,7 +70,7 @@ func main() {
 		userLinkRepository,
 	)
 
-	// Feature 6: Link Management
+	// Feature 6 - Link Management
 
 	managementService := links.NewManagementService(
 		db.Queries,
@@ -81,6 +78,17 @@ func main() {
 
 	managementHandler := links.NewManagementHandler(
 		managementService,
+	)
+
+	// Feature 7 - Production Redirect Engine
+
+	redirectService := redirect.NewService(
+		db.Queries,
+		redisCache.Client,
+	)
+
+	redirectHandler := redirect.NewHandler(
+		redirectService,
 	)
 
 	// Authentication
@@ -97,8 +105,6 @@ func main() {
 		authService,
 	)
 
-	// Analytics handler
-
 	analyticsHandler := analytics.NewHandler(
 		analyticsService,
 	)
@@ -107,6 +113,7 @@ func main() {
 
 	apphttp.RegisterRoutes(
 		router,
+		redirectHandler,
 		linkHandler,
 		userLinkHandler,
 		managementHandler,

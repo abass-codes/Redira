@@ -5,9 +5,9 @@ import (
 
 	"github.com/abass-codes/redira/internal/analytics"
 	"github.com/abass-codes/redira/internal/auth"
-	"github.com/abass-codes/redira/internal/health"
 	"github.com/abass-codes/redira/internal/links"
 	"github.com/abass-codes/redira/internal/middleware"
+	"github.com/abass-codes/redira/internal/redirect"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
@@ -15,22 +15,39 @@ import (
 
 func RegisterRoutes(
 	router *gin.Engine,
+
+	redirectHandler *redirect.Handler,
+
 	linkHandler *links.Handler,
+
 	userLinkHandler *links.UserHandler,
+
 	managementHandler *links.ManagementHandler,
+
 	analyticsHandler *analytics.Handler,
+
 	authHandler *auth.Handler,
+
 	redisClient *redis.Client,
 ) {
 
 	router.GET(
 		"/health",
-		health.Handler,
+		func(c *gin.Context) {
+			c.JSON(
+				200,
+				gin.H{
+					"status": "ok",
+				},
+			)
+		},
 	)
+
+	// Feature 7 production redirect
 
 	router.GET(
 		"/r/:shortCode",
-		linkHandler.Redirect,
+		redirectHandler.Redirect,
 	)
 
 	v1 := router.Group("/api/v1")
@@ -55,22 +72,20 @@ func RegisterRoutes(
 		authHandler.Login,
 	)
 
-	// Protected routes
-
 	protected := v1.Group("")
 
 	protected.Use(
 		middleware.AuthRequired(),
 	)
 
-	// Link creation
+	// Create links
 
 	protected.POST(
 		"/links",
 		linkHandler.Create,
 	)
 
-	// User link list/delete
+	// User links
 
 	protected.GET(
 		"/links",
@@ -82,7 +97,7 @@ func RegisterRoutes(
 		userLinkHandler.DeleteMyLink,
 	)
 
-	// Feature 6 - Link Management
+	// Feature 6
 
 	protected.GET(
 		"/links/:id",
