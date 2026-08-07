@@ -9,6 +9,7 @@ import (
 	"github.com/abass-codes/redira/internal/config"
 	"github.com/abass-codes/redira/internal/database"
 	"github.com/abass-codes/redira/internal/logger"
+	"github.com/abass-codes/redira/internal/middleware"
 
 	apphttp "github.com/abass-codes/redira/internal/http"
 
@@ -153,6 +154,12 @@ func main() {
 
 	router.SetTrustedProxies(nil)
 
+	// Feature 12 - Security Headers
+
+	router.Use(
+		middleware.SecurityHeaders(),
+	)
+
 	// Feature 9 - Frontend CORS
 
 	router.Use(
@@ -160,6 +167,7 @@ func main() {
 
 			AllowOrigins: []string{
 				"http://localhost:3000",
+				"https://redira.com",
 			},
 
 			AllowMethods: []string{
