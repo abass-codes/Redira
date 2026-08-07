@@ -13,12 +13,14 @@ import (
 )
 
 func main() {
+
 	cfg := config.Load()
 
 	db, err := database.Connect(cfg.DatabaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer db.Close()
 
 	log.Println("✅ Connected to PostgreSQL")
@@ -30,17 +32,18 @@ func main() {
 
 	log.Println("✅ Connected to Redis")
 
-	// Links
-	linkRepository := links.NewRepository(db.Queries)
+	linkRepository := links.NewRepository(
+		db.Queries,
+	)
 
-	// Analytics
-	analyticsRepository := analytics.NewRepository(db.Queries)
+	analyticsRepository := analytics.NewRepository(
+		db.Queries,
+	)
 
 	analyticsService := analytics.NewService(
 		analyticsRepository,
 	)
 
-	// Link service with Redis + Analytics
 	linkService := links.NewService(
 		linkRepository,
 		redisCache,
@@ -61,6 +64,7 @@ func main() {
 		router,
 		linkHandler,
 		analyticsHandler,
+		redisCache.Client,
 	)
 
 	log.Printf(
