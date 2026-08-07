@@ -20,7 +20,7 @@ VALUES (
     $1,
     $2
 )
-RETURNING id, original_url, short_code, title, click_count, expires_at, created_at, updated_at
+RETURNING id, original_url, short_code, title, click_count, expires_at, created_at, updated_at, user_id
 `
 
 type CreateLinkParams struct {
@@ -40,6 +40,7 @@ func (q *Queries) CreateLink(ctx context.Context, arg CreateLinkParams) (Link, e
 		&i.ExpiresAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.UserID,
 	)
 	return i, err
 }
@@ -59,9 +60,20 @@ WHERE short_code = $1
 LIMIT 1
 `
 
-func (q *Queries) GetLinkByShortCode(ctx context.Context, shortCode string) (Link, error) {
+type GetLinkByShortCodeRow struct {
+	ID          pgtype.UUID
+	OriginalUrl string
+	ShortCode   string
+	Title       pgtype.Text
+	ClickCount  int64
+	ExpiresAt   pgtype.Timestamptz
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+}
+
+func (q *Queries) GetLinkByShortCode(ctx context.Context, shortCode string) (GetLinkByShortCodeRow, error) {
 	row := q.db.QueryRow(ctx, getLinkByShortCode, shortCode)
-	var i Link
+	var i GetLinkByShortCodeRow
 	err := row.Scan(
 		&i.ID,
 		&i.OriginalUrl,

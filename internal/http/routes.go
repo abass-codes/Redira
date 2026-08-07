@@ -16,6 +16,7 @@ import (
 func RegisterRoutes(
 	router *gin.Engine,
 	linkHandler *links.Handler,
+	userLinkHandler *links.UserHandler,
 	analyticsHandler *analytics.Handler,
 	authHandler *auth.Handler,
 	redisClient *redis.Client,
@@ -41,30 +42,49 @@ func RegisterRoutes(
 		),
 	)
 
-	{
+	// Public authentication
 
-		// Authentication
+	v1.POST(
+		"/auth/register",
+		authHandler.Register,
+	)
 
-		v1.POST(
-			"/auth/register",
-			authHandler.Register,
-		)
+	v1.POST(
+		"/auth/login",
+		authHandler.Login,
+	)
 
-		v1.POST(
-			"/auth/login",
-			authHandler.Login,
-		)
+	// Analytics
 
-		// Protected link routes
+	v1.GET(
+		"/analytics/:id",
+		analyticsHandler.Get,
+	)
 
-		v1.POST(
-			"/links",
-			linkHandler.Create,
-		)
+	// Protected routes
 
-		v1.GET(
-			"/analytics/:id",
-			analyticsHandler.Get,
-		)
-	}
+	protected := v1.Group("")
+
+	protected.Use(
+		middleware.AuthRequired(),
+	)
+
+	// Create link with owner
+
+	protected.POST(
+		"/links",
+		linkHandler.Create,
+	)
+
+	// User link management
+
+	protected.GET(
+		"/links",
+		userLinkHandler.GetMyLinks,
+	)
+
+	protected.DELETE(
+		"/links/:id",
+		userLinkHandler.DeleteMyLink,
+	)
 }

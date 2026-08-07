@@ -10,6 +10,7 @@ import (
 	"github.com/abass-codes/redira/internal/database"
 	apphttp "github.com/abass-codes/redira/internal/http"
 	"github.com/abass-codes/redira/internal/links"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,6 +19,7 @@ func main() {
 	cfg := config.Load()
 
 	db, err := database.Connect(cfg.DatabaseURL)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,19 +29,20 @@ func main() {
 	log.Println("✅ Connected to PostgreSQL")
 
 	redisCache, err := cache.New(cfg.RedisURL)
+
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Println("✅ Connected to Redis")
 
-	// Links
-
 	linkRepository := links.NewRepository(
 		db.Queries,
 	)
 
-	// Analytics
+	userLinkRepository := links.NewUserRepository(
+		db.Queries,
+	)
 
 	analyticsRepository := analytics.NewRepository(
 		db.Queries,
@@ -49,7 +52,20 @@ func main() {
 		analyticsRepository,
 	)
 
-	// Authentication
+	linkService := links.NewService(
+		linkRepository,
+		userLinkRepository,
+		redisCache,
+		analyticsService,
+	)
+
+	linkHandler := links.NewHandler(
+		linkService,
+	)
+
+	userLinkHandler := links.NewUserHandler(
+		userLinkRepository,
+	)
 
 	authRepository := auth.NewRepository(
 		db.Queries,
@@ -63,18 +79,6 @@ func main() {
 		authService,
 	)
 
-	// Link service
-
-	linkService := links.NewService(
-		linkRepository,
-		redisCache,
-		analyticsService,
-	)
-
-	linkHandler := links.NewHandler(
-		linkService,
-	)
-
 	analyticsHandler := analytics.NewHandler(
 		analyticsService,
 	)
@@ -84,6 +88,7 @@ func main() {
 	apphttp.RegisterRoutes(
 		router,
 		linkHandler,
+		userLinkHandler,
 		analyticsHandler,
 		authHandler,
 		redisCache.Client,

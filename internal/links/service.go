@@ -6,70 +6,47 @@ import (
 	"github.com/abass-codes/redira/internal/analytics"
 	"github.com/abass-codes/redira/internal/cache"
 	db "github.com/abass-codes/redira/internal/database/db"
+	"github.com/google/uuid"
 )
 
 type Service struct {
-	repository *Repository
-	cache      *cache.Cache
-	analytics  *analytics.Service
+	repository     *Repository
+	userRepository *UserRepository
+	cache          *cache.Cache
+	analytics      *analytics.Service
 }
 
 func NewService(
 	repository *Repository,
+	userRepository *UserRepository,
 	cache *cache.Cache,
-	analyticsService *analytics.Service,
+	analytics *analytics.Service,
 ) *Service {
+
 	return &Service{
-		repository: repository,
-		cache:      cache,
-		analytics:  analyticsService,
+		repository:     repository,
+		userRepository: userRepository,
+		cache:          cache,
+		analytics:      analytics,
 	}
 }
 
 func (s *Service) Create(
 	ctx context.Context,
-	originalURL string,
-) (*db.Link, error) {
-
-	shortCode, err := GenerateUniqueCode(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	link, err := s.repository.Create(
-		ctx,
-		originalURL,
-		shortCode,
-	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	_ = s.cache.StoreLink(ctx, link)
-
-	return link, nil
-}
-
-func (s *Service) Redirect(
-	ctx context.Context,
+	url string,
 	shortCode string,
-	ip string,
-	userAgent string,
-	referer string,
+	userID *uuid.UUID,
 ) (*db.Link, error) {
 
 	var link *db.Link
+	var err error
 
-	// Redis first
-	cachedLink, err := s.cache.GetLink(ctx, shortCode)
+	if userID != nil {
 
-	if err == nil {
-		link = cachedLink
-	} else {
-		// PostgreSQL fallback
-		link, err = s.repository.GetByShortCode(
+		linkValue, err := s.userRepository.CreateUserLink(
 			ctx,
+			*userID,
+			url,
 			shortCode,
 		)
 
@@ -77,26 +54,57 @@ func (s *Service) Redirect(
 			return nil, err
 		}
 
-		// Store in Redis
-		_ = s.cache.StoreLink(ctx, link)
+		link = &linkValue
+
+	} else {
+
+		link, err = s.repository.Create(
+			ctx,
+			url,
+			shortCode,
+		)
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	// Update click counter
-	_ = s.repository.IncrementClicks(
-		ctx,
-		link.ID,
-	)
-
-	// Store analytics event
-	if s.analytics != nil {
-		_ = s.analytics.RecordClick(
+	if s.cache != nil {
+		_ = s.cache.StoreLink(
 			ctx,
-			link.ID,
-			ip,
-			userAgent,
-			referer,
+			link,
 		)
 	}
+
+	return link, nil
+}
+
+func (s *Service) Redirect(
+	ctx context.Context,
+	shortCode string,
+) (*db.Link, error) {
+
+	if link, err := s.cache.GetLink(
+		ctx,
+		shortCode,
+	); err == nil {
+
+		return link, nil
+	}
+
+	link, err := s.repository.GetByShortCode(
+		ctx,
+		shortCode,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	_ = s.cache.StoreLink(
+		ctx,
+		link,
+	)
 
 	return link, nil
 }

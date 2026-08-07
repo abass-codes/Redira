@@ -26,6 +26,7 @@ type Link struct {
 	ExpiresAt   pgtype.Timestamptz
 	CreatedAt   pgtype.Timestamptz
 	UpdatedAt   pgtype.Timestamptz
+	UserID      pgtype.UUID
 }
 
 type User struct {

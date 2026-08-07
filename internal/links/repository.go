@@ -11,17 +11,29 @@ type Repository struct {
 	queries *db.Queries
 }
 
-func NewRepository(queries *db.Queries) *Repository {
+func NewRepository(
+	queries *db.Queries,
+) *Repository {
+
 	return &Repository{
 		queries: queries,
 	}
 }
 
-func (r *Repository) Create(ctx context.Context, originalURL, shortCode string) (*db.Link, error) {
-	link, err := r.queries.CreateLink(ctx, db.CreateLinkParams{
-		OriginalUrl: originalURL,
-		ShortCode:   shortCode,
-	})
+func (r *Repository) Create(
+	ctx context.Context,
+	url string,
+	shortCode string,
+) (*db.Link, error) {
+
+	link, err := r.queries.CreateLink(
+		ctx,
+		db.CreateLinkParams{
+			OriginalUrl: url,
+			ShortCode:   shortCode,
+		},
+	)
+
 	if err != nil {
 		return nil, err
 	}
@@ -29,15 +41,35 @@ func (r *Repository) Create(ctx context.Context, originalURL, shortCode string) 
 	return &link, nil
 }
 
-func (r *Repository) GetByShortCode(ctx context.Context, shortCode string) (*db.Link, error) {
-	link, err := r.queries.GetLinkByShortCode(ctx, shortCode)
+func (r *Repository) GetByShortCode(
+	ctx context.Context,
+	shortCode string,
+) (*db.Link, error) {
+
+	link, err := r.queries.GetLinkByShortCode(
+		ctx,
+		shortCode,
+	)
+
 	if err != nil {
 		return nil, err
 	}
 
-	return &link, nil
+	return &db.Link{
+		ID:          link.ID,
+		OriginalUrl: link.OriginalUrl,
+		ShortCode:   link.ShortCode,
+		CreatedAt:   link.CreatedAt,
+	}, nil
 }
 
-func (r *Repository) IncrementClicks(ctx context.Context, id pgtype.UUID) error {
-	return r.queries.IncrementClickCount(ctx, id)
+func (r *Repository) IncrementClicks(
+	ctx context.Context,
+	id pgtype.UUID,
+) error {
+
+	return r.queries.IncrementClickCount(
+		ctx,
+		id,
+	)
 }
