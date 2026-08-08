@@ -1,18 +1,18 @@
-"use client";
+import CreateLinkForm from "@/components/forms/CreateLinkForm";
+import LinkTable from "@/components/links/LinkTable";
 
-import CreateLink from "@/components/links/CreateLink";
-import useAuth from "@/hooks/useAuth";
+export default function LinksPage(){
 
-export default function Links() {
-  useAuth();
+return(
 
-  return (
-    <div className="p-10 text-white">
-      <h1 className="text-4xl font-bold mb-8">
-        Links
-      </h1>
+<main className="min-h-screen bg-black space-y-8 p-10">
 
-      <CreateLink />
-    </div>
-  );
+<CreateLinkForm/>
+
+<LinkTable/>
+
+</main>
+
+);
+
 }

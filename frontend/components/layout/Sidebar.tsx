@@ -1,37 +1,63 @@
 "use client";
 
 import Link from "next/link";
-import { logout } from "@/lib/api";
+import {useRouter} from "next/navigation";
+import {removeToken} from "@/lib/auth";
 
-export default function Sidebar() {
-  return (
-    <aside className="w-64 min-h-screen bg-zinc-950 border-r border-zinc-800 p-6 text-white">
-      <h1 className="text-3xl font-bold mb-10">
-        Redira
-      </h1>
+export default function Sidebar(){
 
-      <nav className="space-y-5">
-        <Link
-          href="/dashboard"
-          className="block hover:text-blue-400"
-        >
-          Dashboard
-        </Link>
+const router=useRouter();
 
-        <Link
-          href="/links"
-          className="block hover:text-blue-400"
-        >
-          Links
-        </Link>
+function logout(){
 
-        <button
-          onClick={logout}
-          className="text-red-400 hover:text-red-300"
-        >
-          Logout
-        </button>
-      </nav>
-    </aside>
-  );
+removeToken();
+
+router.push("/login");
+
+}
+
+return(
+
+<aside className="min-h-screen w-64 border-r border-slate-800 bg-slate-950 p-6">
+
+<h1 className="text-2xl font-bold text-white">
+Redira
+</h1>
+
+<nav className="mt-8 space-y-4">
+
+<Link
+href="/dashboard"
+className="block text-slate-300 hover:text-white"
+>
+Dashboard
+</Link>
+
+<Link
+href="/links"
+className="block text-slate-300 hover:text-white"
+>
+Links
+</Link>
+
+<Link
+href="/analytics"
+className="block text-slate-300 hover:text-white"
+>
+Analytics
+</Link>
+
+<button
+onClick={logout}
+className="mt-6 w-full rounded-xl bg-blue-600 py-3 text-white hover:bg-blue-700"
+>
+Logout
+</button>
+
+</nav>
+
+</aside>
+
+);
+
 }

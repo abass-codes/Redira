@@ -1,51 +1,20 @@
-"use client";
+import Dashboard from "@/components/dashboard/Dashboard";
 
-import { useEffect, useState } from "react";
-import api from "@/lib/api";
-import Card from "@/components/dashboard/Card";
-import useAuth from "@/hooks/useAuth";
 
-export default function Dashboard() {
-  useAuth();
+export default function DashboardPage(){
 
-  const [data, setData] = useState<any>(null);
+return(
 
-  useEffect(() => {
-    api
-      .get("/dashboard")
-      .then((res) => setData(res.data));
-  }, []);
+<main className="
+min-h-screen
+bg-black
+p-10
+">
 
-  if (!data) {
-    return (
-      <div className="p-10 text-white">
-        Loading...
-      </div>
-    );
-  }
+<Dashboard/>
 
-  return (
-    <div className="p-10 text-white">
-      <h1 className="text-4xl font-bold mb-8">
-        Dashboard
-      </h1>
+</main>
 
-      <div className="grid grid-cols-3 gap-6">
-        <Card
-          title="Total Links"
-          value={data.TotalLinks}
-        />
+);
 
-        <Card
-          title="Total Clicks"
-          value={data.TotalClicks}
-        />
-
-        <Card
-          title="Active Links"
-          value={data.ActiveLinks}
-        />
-      </div>
-    </div>
-  );
 }
