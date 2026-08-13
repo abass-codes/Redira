@@ -4,17 +4,13 @@ export default function Register(){
 
 return(
 
-<main className="min-h-screen bg-slate-50 flex items-center justify-center px-6">
-
-<div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-10 shadow-xl">
-
-<h1 className="text-5xl font-bold text-slate-900">
-Create Account
-</h1>
+<main className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-6">
 
 <RegisterForm />
 
-</div>
+<footer className="mt-8 text-center text-sm text-slate-500">
+© Redira Yakubu Mohammed Abass 2026
+</footer>
 
 </main>
 

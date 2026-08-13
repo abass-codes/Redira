@@ -44,27 +44,39 @@ setLoading(false);
 
 return(
 
-<div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-lg">
+<div className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-10 shadow-xl">
 
-<h1 className="text-3xl font-bold text-slate-900">
-Login
+<div className="text-center">
+
+<h1 className="text-3xl font-bold tracking-tight text-slate-900">
+REDIRA
 </h1>
 
+<p className="mt-6 text-2xl font-semibold text-slate-900">
+Welcome back
+</p>
+
+<p className="mt-2 text-sm text-slate-500">
+Sign in to manage your links, redirects, and analytics.
+</p>
+
+</div>
+
 {error&&(
-<p className="mt-4 text-red-500">
+<p className="mt-6 text-center text-sm text-red-500">
 {error}
 </p>
 )}
 
 <input
-className="mt-6 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 outline-none focus:border-blue-500"
+className="mt-8 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
 placeholder="Email"
 value={email}
 onChange={(e)=>setEmail(e.target.value)}
 />
 
 <input
-className="mt-4 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 outline-none focus:border-blue-500"
+className="mt-4 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
 placeholder="Password"
 type="password"
 value={password}
@@ -74,10 +86,19 @@ onChange={(e)=>setPassword(e.target.value)}
 <button
 onClick={login}
 disabled={loading}
-className="mt-6 w-full rounded-xl bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700"
+className="mt-6 w-full rounded-xl bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
 >
-{loading?"Logging in...":"Login"}
+
+{loading?"Signing in...":"Sign in"}
+
 </button>
+
+<p className="mt-6 text-center text-sm text-slate-500">
+Don't have an account?{" "}
+<a href="/register" className="font-medium text-blue-600 hover:text-blue-700">
+Create account
+</a>
+</p>
 
 </div>
 
