@@ -66,21 +66,40 @@ func (q *Queries) DeleteUserLink(ctx context.Context, arg DeleteUserLinkParams) 
 }
 
 const getUserLinks = `-- name: GetUserLinks :many
-SELECT id, original_url, short_code, title, click_count, expires_at, created_at, updated_at, user_id, active
+SELECT
+    links.id, links.original_url, links.short_code, links.title, links.click_count, links.expires_at, links.created_at, links.updated_at, links.user_id, links.active,
+    MAX(analytics_events.created_at) AS last_clicked_at
 FROM links
-WHERE user_id = $1
-ORDER BY created_at DESC
+LEFT JOIN analytics_events
+ON links.id = analytics_events.link_id
+WHERE links.user_id = $1
+GROUP BY links.id
+ORDER BY links.created_at DESC
 `
 
-func (q *Queries) GetUserLinks(ctx context.Context, userID pgtype.UUID) ([]Link, error) {
+type GetUserLinksRow struct {
+	ID            pgtype.UUID
+	OriginalUrl   string
+	ShortCode     string
+	Title         pgtype.Text
+	ClickCount    int64
+	ExpiresAt     pgtype.Timestamptz
+	CreatedAt     pgtype.Timestamptz
+	UpdatedAt     pgtype.Timestamptz
+	UserID        pgtype.UUID
+	Active        bool
+	LastClickedAt interface{}
+}
+
+func (q *Queries) GetUserLinks(ctx context.Context, userID pgtype.UUID) ([]GetUserLinksRow, error) {
 	rows, err := q.db.Query(ctx, getUserLinks, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Link
+	var items []GetUserLinksRow
 	for rows.Next() {
-		var i Link
+		var i GetUserLinksRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.OriginalUrl,
@@ -92,6 +111,7 @@ func (q *Queries) GetUserLinks(ctx context.Context, userID pgtype.UUID) ([]Link,
 			&i.UpdatedAt,
 			&i.UserID,
 			&i.Active,
+			&i.LastClickedAt,
 		); err != nil {
 			return nil, err
 		}

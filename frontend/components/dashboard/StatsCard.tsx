@@ -1,56 +1,49 @@
-interface StatsCardProps {
-  title: string;
-  value: number;
-  description: string;
-}
-
-
 export default function StatsCard({
-  title,
-  value,
-  description,
-}: StatsCardProps){
+title,
+value,
+subtitle
+}:{
+title:string;
+value:number;
+subtitle:string;
+}){
 
 return(
 
 <div className="
 rounded-2xl
 border
-border-slate-800
-bg-slate-950
+border-white/10
+bg-gradient-to-br
+from-slate-900
+to-slate-950
 p-6
-shadow-lg
+shadow-xl
 ">
 
-<p className="
-text-sm
-text-slate-400
-">
+<p className="text-sm text-slate-400">
 {title}
 </p>
 
-
-<p className="
+<h2 className="
 mt-3
 text-4xl
 font-bold
 text-white
 ">
 {value}
-</p>
-
+</h2>
 
 <p className="
 mt-2
 text-sm
 text-slate-500
 ">
-{description}
+{subtitle}
 </p>
-
 
 </div>
 
-);
+)
 
 }

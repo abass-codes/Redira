@@ -1,64 +1,179 @@
 "use client";
 
 import useLinks from "@/hooks/useLinks";
+import Link from "next/link";
+import api from "@/lib/api";
+
 
 export default function LinkTable(){
 
-const {links,loading}=useLinks();
+const {links,loading,refresh}=useLinks();
 
-if(loading){
+async function deleteLink(id:string){
 
-return <p className="text-slate-400">Loading links...</p>;
+const confirmDelete = window.confirm(
+"Delete this link?"
+);
+
+if(!confirmDelete) return;
+
+await api.delete(`/links/${id}`);
+
+refresh();
 
 }
 
+
+if(loading)
+return <p className="text-slate-400">Loading...</p>;
+
+
 return(
 
-<div className="rounded-2xl border border-slate-800 bg-slate-950 p-8">
+<div className="
+w-full
+max-w-7xl
+mx-auto
+rounded-2xl
+border
+border-white/10
+bg-slate-950
+overflow-hidden
+">
 
-<h2 className="text-2xl font-bold text-white">
-Your Links
-</h2>
 
-<div className="mt-6 space-y-4">
+<div className="
+grid
+grid-cols-12
+px-6
+py-4
+text-xs
+uppercase
+text-slate-500
+border-b
+border-white/10
+">
 
-{links.length===0&&(
-<p className="text-slate-400">
-No links created yet.
-</p>
-)}
+<div className="col-span-6">
+URL
+</div>
 
-{links.map((link)=>(
+
+<div className="col-span-4">
+Short Link
+</div>
+
+
+<div className="col-span-1">
+Clicks
+</div>
+
+<div className="col-span-1 text-right">
+</div>
+
+
+</div>
+
+
+
+{
+links.map(link=>(
+
 
 <div
 key={link.ID}
-className="rounded-xl border border-slate-800 bg-slate-900 p-5"
+className="
+grid
+grid-cols-12
+items-center
+px-6
+py-4
+border-b
+border-white/5
+hover:bg-white/[0.03]
+transition
+"
 >
 
-<p className="truncate text-white">
+
+<div className="
+col-span-6
+truncate
+text-white
+">
+
 {link.OriginalUrl}
-</p>
-
-<div className="mt-3 flex justify-between">
-
-<p className="text-blue-400">
-{link.ShortCode}
-</p>
-
-<p className="text-slate-400">
-{link.ClickCount ?? 0} clicks
-</p>
 
 </div>
 
+
+
+<div className="
+col-span-4
+">
+
+<Link
+href={`http://localhost:8080/r/${link.ShortCode}`}
+target="_blank"
+className="
+text-blue-400
+hover:text-blue-300
+transition
+"
+>
+
+redira/{link.ShortCode}
+
+</Link>
+
+
 </div>
 
-))}
+
+
+<div className="
+col-span-1
+text-white
+font-bold
+">
+
+{link.ClickCount ?? 0}
 
 </div>
 
+
+<div className="col-span-1 text-right">
+
+<button
+onClick={()=>deleteLink(link.ID)}
+className="
+rounded-lg
+border
+border-red-500/30
+px-3
+py-1
+text-sm
+text-red-400
+hover:bg-red-500/10
+"
+>
+Delete
+</button>
+
 </div>
 
-);
+
+
+</div>
+
+
+))
+
+}
+
+
+</div>
+
+)
 
 }

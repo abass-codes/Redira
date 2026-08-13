@@ -1,22 +1,35 @@
-import type { Metadata } from "next";
 import "./globals.css";
+import Sidebar from "@/components/layout/Sidebar";
 
-export const metadata: Metadata = {
-  title: "Redira | Shorten Links. Track Performance.",
-  description:
-    "Redira is a modern URL shortening platform with analytics and performance tracking.",
+export const metadata={
+title:"Redira",
+description:"URL Analytics Platform"
 };
 
 export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body>
-        {children}
-      </body>
-    </html>
-  );
+children
+}:{
+children:React.ReactNode;
+}){
+
+return(
+<html lang="en">
+<body className="bg-black text-white">
+
+<Sidebar/>
+
+<main className="ml-72 min-h-screen">
+
+<div className="w-full max-w-7xl mx-auto px-8 py-10">
+
+{children}
+
+</div>
+
+</main>
+
+</body>
+</html>
+);
+
 }

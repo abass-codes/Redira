@@ -13,10 +13,15 @@ RETURNING *;
 
 
 -- name: GetUserLinks :many
-SELECT *
+SELECT
+    links.*,
+    MAX(analytics_events.created_at) AS last_clicked_at
 FROM links
-WHERE user_id = $1
-ORDER BY created_at DESC;
+LEFT JOIN analytics_events
+ON links.id = analytics_events.link_id
+WHERE links.user_id = $1
+GROUP BY links.id
+ORDER BY links.created_at DESC;
 
 
 -- name: DeleteUserLink :exec

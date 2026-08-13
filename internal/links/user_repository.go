@@ -51,7 +51,7 @@ func (r *UserRepository) CreateUserLink(
 func (r *UserRepository) GetUserLinks(
 	ctx context.Context,
 	userID uuid.UUID,
-) ([]db.Link, error) {
+) ([]db.GetUserLinksRow, error) {
 
 	return r.queries.GetUserLinks(
 		ctx,

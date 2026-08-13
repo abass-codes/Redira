@@ -27,3 +27,11 @@ a {
 button {
   cursor:pointer;
 }
+*{
+scroll-behavior:smooth;
+}
+
+body{
+background:#000;
+}
+
