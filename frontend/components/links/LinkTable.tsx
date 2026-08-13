@@ -31,22 +31,22 @@ No links created yet.
 {links.map((link)=>(
 
 <div
-key={link.id}
+key={link.ID}
 className="rounded-xl border border-slate-800 bg-slate-900 p-5"
 >
 
 <p className="truncate text-white">
-{link.original_url}
+{link.OriginalUrl}
 </p>
 
 <div className="mt-3 flex justify-between">
 
 <p className="text-blue-400">
-{link.short_code}
+{link.ShortCode}
 </p>
 
 <p className="text-slate-400">
-{link.clicks??0} clicks
+{link.ClickCount ?? 0} clicks
 </p>
 
 </div>

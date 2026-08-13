@@ -8,6 +8,14 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type AnalyticsEvent struct {
+	ID        pgtype.UUID
+	LinkID    pgtype.UUID
+	IpAddress pgtype.Text
+	UserAgent pgtype.Text
+	CreatedAt pgtype.Timestamp
+}
+
 type ClickEvent struct {
 	ID        pgtype.UUID
 	LinkID    pgtype.UUID

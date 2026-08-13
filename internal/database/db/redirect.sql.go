@@ -12,12 +12,12 @@ import (
 const getRedirectLink = `-- name: GetRedirectLink :one
 SELECT id, original_url, short_code, title, click_count, expires_at, created_at, updated_at, user_id, active
 FROM links
-WHERE short_code = $1
+WHERE LOWER(short_code) = LOWER($1)
 LIMIT 1
 `
 
-func (q *Queries) GetRedirectLink(ctx context.Context, shortCode string) (Link, error) {
-	row := q.db.QueryRow(ctx, getRedirectLink, shortCode)
+func (q *Queries) GetRedirectLink(ctx context.Context, lower string) (Link, error) {
+	row := q.db.QueryRow(ctx, getRedirectLink, lower)
 	var i Link
 	err := row.Scan(
 		&i.ID,

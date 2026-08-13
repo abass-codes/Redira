@@ -1,24 +1,21 @@
 -- name: CreateClickEvent :exec
-INSERT INTO click_events (
+INSERT INTO analytics_events (
     link_id,
     ip_address,
-    user_agent,
-    referer
+    user_agent
 )
 VALUES (
     $1,
     $2,
-    $3,
-    $4
+    $3
 );
 
 
 -- name: GetLinkAnalytics :many
 SELECT
-    clicked_at,
+    created_at,
     ip_address,
-    user_agent,
-    referer
-FROM click_events
+    user_agent
+FROM analytics_events
 WHERE link_id = $1
-ORDER BY clicked_at DESC;
+ORDER BY created_at DESC;

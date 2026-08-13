@@ -19,9 +19,13 @@ setLoading(true);
 
 const response=await api.post("/links",{url});
 
-setShortUrl(response.data.short_url);
+setShortUrl(response.data.shortCode);
 
 setUrl("");
+
+}catch(error){
+
+console.error(error);
 
 }finally{
 

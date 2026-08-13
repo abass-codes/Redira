@@ -32,6 +32,15 @@ func (s *Service) Redirect(
 
 	cacheKey := "redirect:" + shortCode
 
+	cached, err := s.redis.Get(
+		ctx,
+		cacheKey,
+	).Result()
+
+	if err == nil && cached != "" {
+
+		return cached, nil
+	}
 
 	link, err := s.queries.GetRedirectLink(
 		ctx,
@@ -63,16 +72,6 @@ func (s *Service) Redirect(
 		db.CreateClickEventParams{
 			LinkID: link.ID,
 		},
-	)
-
-	if err != nil {
-
-		return link.OriginalUrl, nil
-	}
-
-	err = s.queries.IncrementClickCount(
-		ctx,
-		link.ID,
 	)
 
 	if err != nil {

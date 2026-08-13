@@ -29,7 +29,6 @@ func (r *Repository) CreateEvent(
 		LinkID:    linkID,
 		IpAddress: pgtype.Text{String: ip, Valid: ip != ""},
 		UserAgent: pgtype.Text{String: userAgent, Valid: userAgent != ""},
-		Referer:   pgtype.Text{String: referer, Valid: referer != ""},
 	})
 }
 

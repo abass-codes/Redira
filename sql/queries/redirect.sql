@@ -1,5 +1,5 @@
 -- name: GetRedirectLink :one
 SELECT *
 FROM links
-WHERE short_code = $1
+WHERE LOWER(short_code) = LOWER($1)
 LIMIT 1;

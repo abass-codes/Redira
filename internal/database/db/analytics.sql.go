@@ -12,17 +12,15 @@ import (
 )
 
 const createClickEvent = `-- name: CreateClickEvent :exec
-INSERT INTO click_events (
+INSERT INTO analytics_events (
     link_id,
     ip_address,
-    user_agent,
-    referer
+    user_agent
 )
 VALUES (
     $1,
     $2,
-    $3,
-    $4
+    $3
 )
 `
 
@@ -30,35 +28,27 @@ type CreateClickEventParams struct {
 	LinkID    pgtype.UUID
 	IpAddress pgtype.Text
 	UserAgent pgtype.Text
-	Referer   pgtype.Text
 }
 
 func (q *Queries) CreateClickEvent(ctx context.Context, arg CreateClickEventParams) error {
-	_, err := q.db.Exec(ctx, createClickEvent,
-		arg.LinkID,
-		arg.IpAddress,
-		arg.UserAgent,
-		arg.Referer,
-	)
+	_, err := q.db.Exec(ctx, createClickEvent, arg.LinkID, arg.IpAddress, arg.UserAgent)
 	return err
 }
 
 const getLinkAnalytics = `-- name: GetLinkAnalytics :many
 SELECT
-    clicked_at,
+    created_at,
     ip_address,
-    user_agent,
-    referer
-FROM click_events
+    user_agent
+FROM analytics_events
 WHERE link_id = $1
-ORDER BY clicked_at DESC
+ORDER BY created_at DESC
 `
 
 type GetLinkAnalyticsRow struct {
-	ClickedAt pgtype.Timestamptz
+	CreatedAt pgtype.Timestamp
 	IpAddress pgtype.Text
 	UserAgent pgtype.Text
-	Referer   pgtype.Text
 }
 
 func (q *Queries) GetLinkAnalytics(ctx context.Context, linkID pgtype.UUID) ([]GetLinkAnalyticsRow, error) {
@@ -70,12 +60,7 @@ func (q *Queries) GetLinkAnalytics(ctx context.Context, linkID pgtype.UUID) ([]G
 	var items []GetLinkAnalyticsRow
 	for rows.Next() {
 		var i GetLinkAnalyticsRow
-		if err := rows.Scan(
-			&i.ClickedAt,
-			&i.IpAddress,
-			&i.UserAgent,
-			&i.Referer,
-		); err != nil {
+		if err := rows.Scan(&i.CreatedAt, &i.IpAddress, &i.UserAgent); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

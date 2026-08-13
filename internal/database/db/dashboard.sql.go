@@ -13,12 +13,12 @@ import (
 
 const getClickTimeline = `-- name: GetClickTimeline :many
 SELECT
-    DATE(clicked_at) AS date,
+    DATE(created_at) AS date,
     COUNT(*) AS clicks
-FROM click_events
+FROM analytics_events
 WHERE link_id = $1
-GROUP BY DATE(clicked_at)
-ORDER BY DATE(clicked_at)
+GROUP BY DATE(created_at)
+ORDER BY DATE(created_at)
 `
 
 type GetClickTimelineRow struct {
@@ -48,15 +48,17 @@ func (q *Queries) GetClickTimeline(ctx context.Context, linkID pgtype.UUID) ([]G
 
 const getDashboardSummary = `-- name: GetDashboardSummary :one
 SELECT
-    COUNT(*) AS total_links,
-    COALESCE(SUM(click_count),0) AS total_clicks,
-    COUNT(*) FILTER (WHERE active = true) AS active_links
+    COUNT(DISTINCT links.id) AS total_links,
+    COUNT(analytics_events.id) AS total_clicks,
+    COUNT(DISTINCT links.id) FILTER (WHERE links.active = true) AS active_links
 FROM links
+LEFT JOIN analytics_events
+ON links.id = analytics_events.link_id
 `
 
 type GetDashboardSummaryRow struct {
 	TotalLinks  int64
-	TotalClicks interface{}
+	TotalClicks int64
 	ActiveLinks int64
 }
 

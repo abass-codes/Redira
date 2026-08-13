@@ -5,13 +5,13 @@ import api from "@/lib/api";
 
 export interface Link{
 
-id:string;
+ID:string;
 
-original_url:string;
+OriginalUrl:string;
 
-short_code:string;
+ShortCode:string;
 
-clicks:number;
+ClickCount:number;
 
 }
 
@@ -29,7 +29,7 @@ try{
 
 const response=await api.get("/links");
 
-setLinks(response.data);
+setLinks(response.data.links ?? []);
 
 }finally{
 
